@@ -39,7 +39,7 @@ class WechatBot {
         this.bot.on("scan", this.onScan.bind(this));
 
         // 处理所有事件
-        this.bot.on("all", this.onAll.bind(this));
+        //this.bot.on("all", this.onAll.bind(this));
     }
 
     async initRoomListeners() {
@@ -78,7 +78,7 @@ class WechatBot {
                         await room.say(`群名由"${oldTopic}"改为"${newTopic}"`, '@all');
                     });
                 } else {
-                    console.log(`未找到群：${topic}，请确保群已保存到通讯录`);
+                    console.log(`未找到群：${roomName}，请确保群已保存到通讯录`);
                 }
             }
         } catch (error) {
@@ -88,39 +88,44 @@ class WechatBot {
 
     async onMessage(msg) {
         try {
-            const room = msg.room();
-            console.log('群聊消息:', room);
-            const from = msg.from();
-            console.log('来自:', from);
-            // const topic = await this.bot.Room.find({ topic: "今天有空吗？" })
-            // console.log('当前群名称:', topic);
+            // 添加调试信息
+            console.log('消息来源:', msg._msgSource);
+            console.log('消息类型:', msg.type());
+            console.log('消息内容:', msg.text());
+            
+            const mentionSelf = await msg.mentionSelf();
+            console.log('是否@机器人:', mentionSelf);
+            
+            const room = await msg.room();
             // 如果是私聊消息，直接处理
-            // if (!room) {
-            //     if (msg.type() === this.bot.Message.Type.Text) {
-            //         const text = msg.text();
-            //         const response = await this.openaiService.generateResponse(text);
-            //         await msg.say(response);
-            //     }
-            //     return;
-            // }
+            if (!room) {
+                if (msg.type() === this.bot.Message.Type.Text) {
+                    const text = msg.text();
+                    const response = await this.openaiService.generateResponse(text);
+                    await msg.say(response);
+                }
+                return;
+            }
 
-            // 如果是群消息，检查是否是允许的群
-            // const topic = await this.bot.Room.find({ name: "今天有空吗？" })
-            // console.log('当前群名称:', topic);
+            // 如果是群消息，获取群名称
+            const roomName = await room.topic();
 
-            // if (!this.allowedRoomList.includes(topic)) {
-            //     console.log('不在允许的群列表中');
-            //     return;
-            // } else {
-            //     // 群消息需要@才回复
-            //     if (msg.mentionSelf()) {
-            //         const text = msg.text().replace(/@[^,，：:\s]*\s*/g, '').trim(); // 移除@部分
-            //         if (text) {
-            //             const response = await this.openaiService.generateResponse(text);
-            //             await msg.say(response);
-            //         }
-            //     }
-            // }
+            // 检查是否是允许的群
+            if (!this.allowedRoomList.includes(roomName)) {
+                console.log('不在允许的群列表中');
+                return;
+            } else {
+                // 群消息需要@才回复
+                const mentionSelf = await msg.mentionSelf();
+                console.log('群消息需要@才回复', mentionSelf);
+                // if (mentionSelf) {
+                //     const text = msg.text().replace(/@[^,，：:\s]*\s*/g, '').trim(); // 移除@部分
+                //     if (text) {
+                //         const response = await this.openaiService.generateResponse(text);
+                //         await msg.say(response);
+                //     }
+                // }
+            }
         } catch (error) {
             console.error('处理消息时发生错误:', error);
         }
@@ -151,9 +156,9 @@ class WechatBot {
         console.log('请扫描二维码登录:', qrcode.url);
     }
 
-    onAll(msg) {
-        console.log('收到事件:', msg);
-    }
+    // onAll(msg) {
+    //     console.log('收到事件:', msg);
+    // }
 
     async start() {
         try {
