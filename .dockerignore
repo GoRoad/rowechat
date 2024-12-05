@@ -1,0 +1,23 @@
+# 数据库文件
+*.db
+
+# 日志文件
+*.log
+
+# vscode 配置文件
+.vscode/
+
+# git 忽略文件
+.gitignore
+
+# 登陆用户配置文件
+ds.json
+
+# 环境配置文件
+.env*
+
+# node_modules 文件
+node_modules
+
+# docker-compose 配置文件
+docker-compose.yml

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  rowechat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rowechat
+    restart: unless-stopped
+    ports:
+      - "${PORT:-2533}:2533"
+    volumes:
+      - ./data:/app
+    environment:
+      - PORT=${PORT:-2533}
+      - DEBUG=${DEBUG:-false}
+      - WEGE_BASE_API_URL=${WEGE_BASE_API_URL}
+      - WEGE_FILE_API_URL=${WEGE_FILE_API_URL}
+      - WEGE_LOCAL_PROXY=${WEGE_LOCAL_PROXY}
+      - OPENAI_API_BASE=${OPENAI_API_BASE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-3.5-turbo}
+      - ALLOWED_ROOM_LIST=${ALLOWED_ROOM_LIST}

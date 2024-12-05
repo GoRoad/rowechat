@@ -1,24 +1,24 @@
 const { GeweBot, Filebox, UrlLink, WeVideo, Voice, MiniApp, AppMsg } = require("gewechaty");
-const dotenv = require('dotenv');
+const config = require('../config/env');
 const OpenAIService = require('./openaiService');
 
 // 加载环境变量
-dotenv.config();
+// dotenv.config();
 
 class WechatBot {
     constructor() {
         this.bot = new GeweBot({
-            debug: process.env.DEBUG === 'true',
-            port: 5000,
+            debug: config.DEBUG,
+            port: config.PORT,  // 使用统一的端口
             static: "static",
             route: "/getWechatCallBack",
-            proxy: process.env.WEGE_LOCAL_PROXY,
-            base_api: process.env.WEGE_BASE_API_URL,
-            file_api: process.env.WEGE_FILE_API_URL,
+            proxy: config.WEGE_LOCAL_PROXY,
+            base_api: config.WEGE_BASE_API_URL,
+            file_api: config.WEGE_FILE_API_URL,
         });
 
         // 确保allowedRoomList始终是数组
-        const roomList = process.env.ALLOWED_ROOM_LIST || '';
+        const roomList = config.ALLOWED_ROOM_LIST || '';
         this.allowedRoomList = roomList ? roomList.split(',').map(roomName => roomName.trim()) : [];
 
         this.openaiService = new OpenAIService();
@@ -88,14 +88,6 @@ class WechatBot {
 
     async onMessage(msg) {
         try {
-            // 添加调试信息
-            console.log('消息来源:', msg._msgSource);
-            console.log('消息类型:', msg.type());
-            console.log('消息内容:', msg.text());
-            
-            const mentionSelf = await msg.mentionSelf();
-            console.log('是否@机器人:', mentionSelf);
-            
             const room = await msg.room();
             // 如果是私聊消息，直接处理
             if (!room) {
@@ -117,14 +109,13 @@ class WechatBot {
             } else {
                 // 群消息需要@才回复
                 const mentionSelf = await msg.mentionSelf();
-                console.log('群消息需要@才回复', mentionSelf);
-                // if (mentionSelf) {
-                //     const text = msg.text().replace(/@[^,，：:\s]*\s*/g, '').trim(); // 移除@部分
-                //     if (text) {
-                //         const response = await this.openaiService.generateResponse(text);
-                //         await msg.say(response);
-                //     }
-                // }
+                if (mentionSelf) {
+                    const text = msg.text().replace(/@[^,，：:\s]*\s*/g, '').trim(); // 移除@部分
+                    if (text) {
+                        const response = await this.openaiService.generateResponse(text);
+                        await msg.say(response);
+                    }
+                }
             }
         } catch (error) {
             console.error('处理消息时发生错误:', error);
