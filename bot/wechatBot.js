@@ -88,6 +88,14 @@ class WechatBot {
 
     async onMessage(msg) {
         try {
+
+            // 超过5分钟的消息不再回复
+            if (msg.age() > 5*60) {
+                console.log(msg.age())
+                console.info('Message discarded because its ToOLD(than 5 minutes)')
+                return;
+            }
+            
             const room = await msg.room();
             // 如果是私聊消息，直接处理
             if (!room) {
