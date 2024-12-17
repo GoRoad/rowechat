@@ -1,6 +1,6 @@
 {
   "name": "rowechat",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development node index.js",
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
-    "gewechaty": "^0.0.18",
+    "gewechaty": "^0.0.19",
     "openai": "^4.75.0"
   },
   "devDependencies": {

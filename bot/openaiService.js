@@ -12,12 +12,12 @@ class OpenAIService {
         try {
             const completion = await this.openai.chat.completions.create({
                 messages: [
-                    { role: "system", content: "你是一个友好的助手，可以帮助回答各种问题。" },
+                    { role: "system", content: "你叫路小明，你是一个友好的人工智能助手，请用这个角色回答我的问题，除非有要求，否则一律使用自然语言回答，不要使用markdown格式" },
                     { role: "user", content: prompt }
                 ],
                 model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
                 temperature: 0.7,
-                max_tokens: 1000,
+                max_tokens: 4096,
             });
 
             return completion.choices[0].message.content;
